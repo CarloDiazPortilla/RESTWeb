@@ -1,7 +1,8 @@
-import express from "express";
+import express, { Router } from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { envs } from "../config/plugins/envs.js";
+import { AppRoutes } from "./routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,11 +18,15 @@ export class Server {
 
   private static readonly PORT: number = envs.PORT;
   private static readonly PUBLIC_PATH: string = envs.PUBLIC_PATH;
+  private static routes: Router = AppRoutes.routes;
 
   static async run() {
 
     // Public resources
     this.app.use(express.static(this.PUBLIC_PATH));
+
+    // Routes
+    this.app.use(this.routes);
 
     this.app.get("/{*splat}", (req, res) => {
       const indexPath = path.join(__dirname + `../../../${this.PUBLIC_PATH}/index.html`);
