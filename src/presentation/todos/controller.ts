@@ -1,9 +1,9 @@
 import type { Request, Response } from "express"
 
 const todos = [
-  { id: 1, text: "Buy milk", createdAt: new Date() },
-  { id: 2, text: "Buy bread", createdAt: null },
-  { id: 3, text: "Buy butter", createdAt: new Date() },
+  { id: 1, text: "Buy milk", completedAt: new Date() },
+  { id: 2, text: "Buy bread", completedAt: null },
+  { id: 3, text: "Buy butter", completedAt: new Date() },
 ]
 
 export class TodosController {
@@ -23,7 +23,7 @@ export class TodosController {
       return todo.id === todoId;
     })
 
-    if (!todo) res.status(404).json({
+    if (!todo) return res.status(404).json({
       message: `Couldn't find the todo with id: ${id}`,
     })
     return res.json(todo);
@@ -36,10 +36,37 @@ export class TodosController {
     });
     const newTodo = {
       id: todos.length + 1,
-      createdAt: new Date(),
+      completedAt: new Date(),
       text,
     };
     todos.push(newTodo);
     return res.json(newTodo);
+  }
+
+  public updateTodo = (req: Request, res: Response) => {
+    const { id } = req.params;
+    const updateTodoId = Number(id);
+
+    if (isNaN(updateTodoId)) return res.status(400).json({
+      message: "ID argument must be a number"
+    })
+
+    const updatedTodo = todos.find(todo => {
+      return todo.id === updateTodoId;
+    })
+
+    if (!updatedTodo) return res.status(404).json({
+      message: `Couldn't find the todo with id: ${id}`,
+    })
+
+    const { text, completedAt } = req.body;
+
+    updatedTodo.text = text || updatedTodo.text;
+
+    (completedAt === "null") ?
+      updatedTodo.completedAt = null :
+      updatedTodo.completedAt = new Date(completedAt || updatedTodo.completedAt);
+
+    return res.json(updatedTodo);
   }
 }
