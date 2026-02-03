@@ -22,6 +22,10 @@ export class Server {
 
   static async run() {
 
+    // Middleware
+    this.app.use(express.json()); // raw
+    this.app.use(express.urlencoded({ extended: true })) // x-www-form-urlencoded
+
     // Public resources
     this.app.use(express.static(this.PUBLIC_PATH));
 
