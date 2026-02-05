@@ -1,6 +1,6 @@
 import type { Request, Response } from "express"
 import { prisma } from "../../database/postgresdb/init";
-import { CreateTodoDto } from "../../domain/dtos/todos/create-todo.dto";
+import { CreateTodoDto, UpdateTodoDto } from "../../domain/dtos/todos";
 
 export class TodosController {
 
@@ -49,7 +49,11 @@ export class TodosController {
       message: "ID argument must be a number"
     })
 
-    const { text, completedAt } = req.body;
+    const [error, updateTodoDto] = UpdateTodoDto.create(req.body);
+
+    if (error) return res.status(404).json({
+      message: error
+    })
 
     const todo = await prisma.todo.findUnique({
       where: {
@@ -62,10 +66,7 @@ export class TodosController {
     })
 
     const updatedTodo = await prisma.todo.update({
-      data: {
-        text,
-        completedAt: (!completedAt) ? todo.completedAt : new Date(completedAt)
-      },
+      data: updateTodoDto!.values,
       where: {
         id: updateTodoId
       }
