@@ -49,7 +49,7 @@ export class TodosController {
       message: "ID argument must be a number"
     })
 
-    const [error, updateTodoDto] = UpdateTodoDto.create(req.body);
+    const [error, updateTodoDto] = UpdateTodoDto.create({ updateTodoId, ...req.body });
 
     if (error) return res.status(404).json({
       message: error
