@@ -1,5 +1,6 @@
 export class UpdateTodoDto {
   private constructor(
+    public readonly id: number,
     public readonly text?: string,
     public readonly completedAt?: Date,
   ) { }
@@ -12,7 +13,10 @@ export class UpdateTodoDto {
   }
 
   static create(props: { [key: string]: any }): [(string | undefined)?, (UpdateTodoDto | undefined)?] {
-    const { text, completedAt } = props;
+    const { id, text, completedAt } = props;
+
+    if (!id) return ["id must be provided", undefined];
+
     let newCompletedAt = completedAt;
 
     if (completedAt) {
@@ -22,6 +26,6 @@ export class UpdateTodoDto {
       }
     }
 
-    return [undefined, new UpdateTodoDto(text, newCompletedAt)];
+    return [undefined, new UpdateTodoDto(id, text, newCompletedAt)];
   }
 }
